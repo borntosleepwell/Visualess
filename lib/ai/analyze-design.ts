@@ -7,4 +7,3 @@ export async function analyzeDesignImage(file: File) {
     prompt: designAnalysisPrompt,
   });
 }
-

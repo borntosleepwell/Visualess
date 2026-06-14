@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { ExternalSearchButtons } from "@/components/analysis/external-search-buttons";
 
 type KeywordListProps = {
+  label: string;
   keywords: string[];
 };
 
-export function KeywordList({ keywords }: KeywordListProps) {
+export function KeywordList({ label, keywords }: KeywordListProps) {
   const [copiedKeyword, setCopiedKeyword] = useState<string | null>(null);
 
   async function copyKeyword(keyword: string) {
@@ -28,7 +29,7 @@ export function KeywordList({ keywords }: KeywordListProps) {
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-zinc-950">Search keywords</h3>
+        <h3 className="text-sm font-semibold text-zinc-950">{label}</h3>
         <Button type="button" variant="outline" size="sm" onClick={copyAllKeywords}>
           {copiedKeyword === "all" ? (
             <Check className="size-3.5" />

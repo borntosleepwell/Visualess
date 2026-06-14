@@ -15,12 +15,12 @@ type ImagePreviewProps = {
 export function ImagePreview({ file, previewUrl, onRemove }: ImagePreviewProps) {
   return (
     <section className="space-y-3">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+      <div className="relative flex min-h-[260px] max-h-[72vh] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 sm:min-h-[360px]">
         <Image
           src={previewUrl}
           alt={`Preview of ${file.name}`}
           fill
-          className="object-cover"
+          className="object-contain"
           sizes="(max-width: 768px) 100vw, 42vw"
           unoptimized
         />

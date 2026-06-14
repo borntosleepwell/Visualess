@@ -2,13 +2,21 @@ import { Sparkles } from "lucide-react";
 
 import { KeywordList } from "@/components/analysis/keyword-list";
 import { TagGroup } from "@/components/analysis/tag-group";
-import type { DesignAnalysis } from "@/types/analysis";
+import type { DesignAnalysis, OutputLanguage } from "@/types/analysis";
 
 type AnalysisResultProps = {
   analysis: DesignAnalysis;
+  language: OutputLanguage;
 };
 
-export function AnalysisResult({ analysis }: AnalysisResultProps) {
+const keywordLabels: Record<OutputLanguage, string> = {
+  id: "Keyword pencarian",
+  en: "Search keywords",
+};
+
+export function AnalysisResult({ analysis, language }: AnalysisResultProps) {
+  const content = analysis.localized[language];
+
   return (
     <article className="space-y-6 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="space-y-3">
@@ -20,23 +28,23 @@ export function AnalysisResult({ analysis }: AnalysisResultProps) {
             AI style reading
           </p>
           <h2 className="mt-1 text-2xl font-semibold text-zinc-950">
-            {analysis.title}
+            {content.title}
           </h2>
         </div>
         <p className="text-sm leading-7 text-zinc-600">
-          {analysis.designNarrative}
+          {content.designNarrative}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <TagGroup label="Style" tags={analysis.styleTags} />
-        <TagGroup label="Layout" tags={analysis.layoutTags} />
-        <TagGroup label="Color" tags={analysis.colorTags} />
-        <TagGroup label="Typography" tags={analysis.typographyTags} />
-        <TagGroup label="Mood" tags={analysis.moodTags} />
+        <TagGroup label="Style" tags={content.styleTags} />
+        <TagGroup label="Layout" tags={content.layoutTags} />
+        <TagGroup label="Color" tags={content.colorTags} />
+        <TagGroup label="Typography" tags={content.typographyTags} />
+        <TagGroup label="Mood" tags={content.moodTags} />
       </div>
 
-      <KeywordList keywords={analysis.searchKeywords} />
+      <KeywordList label={keywordLabels[language]} keywords={content.searchKeywords} />
     </article>
   );
 }

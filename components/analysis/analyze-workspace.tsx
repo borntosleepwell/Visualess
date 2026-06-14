@@ -9,7 +9,13 @@ import { ImagePreview } from "@/components/analysis/image-preview";
 import { UploadDropzone } from "@/components/analysis/upload-dropzone";
 import { Button } from "@/components/ui/button";
 import { analyzeDesignResponseSchema } from "@/lib/validation/analysis-schema";
-import type { DesignAnalysis } from "@/types/analysis";
+import { cn } from "@/lib/utils";
+import type { DesignAnalysis, OutputLanguage } from "@/types/analysis";
+
+const outputLanguages: Array<{ label: string; value: OutputLanguage }> = [
+  { label: "Indonesia", value: "id" },
+  { label: "English", value: "en" },
+];
 
 export function AnalyzeWorkspace() {
   const [file, setFile] = useState<File | null>(null);
@@ -17,6 +23,7 @@ export function AnalyzeWorkspace() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<DesignAnalysis | null>(null);
+  const [outputLanguage, setOutputLanguage] = useState<OutputLanguage>("id");
 
   const canAnalyze = Boolean(file) && !isAnalyzing;
 
@@ -72,6 +79,16 @@ export function AnalyzeWorkspace() {
       if (!payload.success) {
         setErrorMessage(payload.message);
         setAnalysis(null);
+        return;
+      }
+
+      if (!payload.data.isDesignRelated) {
+        setAnalysis(null);
+        const rejectionContent = payload.data.localized[outputLanguage];
+        setErrorMessage(
+          rejectionContent.rejectionReason ??
+            "This image does not look like a design reference. Please upload a UI, graphic design, poster, branding, or visual layout reference.",
+        );
         return;
       }
 
@@ -143,6 +160,29 @@ export function AnalyzeWorkspace() {
               </p>
             ) : null}
 
+            <section className="space-y-2">
+              <p className="text-xs font-medium uppercase text-zinc-500">
+                Output language
+              </p>
+              <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
+                {outputLanguages.map((language) => (
+                  <button
+                    key={language.value}
+                    type="button"
+                    onClick={() => setOutputLanguage(language.value)}
+                    className={cn(
+                      "h-8 rounded-md px-3 text-sm font-medium text-zinc-500 transition",
+                      outputLanguage === language.value &&
+                        "bg-zinc-950 text-white shadow-sm",
+                    )}
+                    aria-pressed={outputLanguage === language.value}
+                  >
+                    {language.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
             <div className="flex flex-wrap gap-3">
               <Button
                 type="button"
@@ -170,7 +210,7 @@ export function AnalyzeWorkspace() {
             transition={{ duration: 0.35, delay: 0.08 }}
           >
             {analysis ? (
-              <AnalysisResult analysis={analysis} />
+              <AnalysisResult analysis={analysis} language={outputLanguage} />
             ) : (
               <section className="flex min-h-[520px] flex-col justify-between rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
                 <div>

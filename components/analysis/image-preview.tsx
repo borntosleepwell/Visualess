@@ -15,7 +15,7 @@ type ImagePreviewProps = {
 export function ImagePreview({ file, previewUrl, onRemove }: ImagePreviewProps) {
   return (
     <section className="space-y-3">
-      <div className="relative flex min-h-[260px] max-h-[72vh] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 sm:min-h-[360px]">
+      <div className="relative flex min-h-[320px] max-h-[52vh] overflow-hidden rounded-[1.75rem] border border-white/70 bg-[#171a16] sm:min-h-[370px] lg:min-h-[420px]">
         <Image
           src={previewUrl}
           alt={`Preview of ${file.name}`}
@@ -25,10 +25,10 @@ export function ImagePreview({ file, previewUrl, onRemove }: ImagePreviewProps) 
           unoptimized
         />
       </div>
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white p-3">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/20 bg-black/35 p-3 text-zinc-50">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-zinc-950">{file.name}</p>
-          <p className="text-xs text-zinc-500">{formatFileSize(file.size)}</p>
+          <p className="truncate text-sm font-medium">{file.name}</p>
+          <p className="text-xs font-light text-zinc-300">{formatFileSize(file.size)}</p>
         </div>
         <Button
           type="button"
@@ -36,6 +36,7 @@ export function ImagePreview({ file, previewUrl, onRemove }: ImagePreviewProps) 
           size="icon-sm"
           onClick={onRemove}
           aria-label="Remove image"
+          className="text-zinc-100 hover:bg-white/10 hover:text-white"
         >
           <X className="size-4" />
         </Button>

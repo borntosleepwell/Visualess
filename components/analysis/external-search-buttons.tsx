@@ -27,6 +27,7 @@ export function ExternalSearchButtons({ keyword }: ExternalSearchButtonsProps) {
             target="_blank"
             rel="noreferrer"
             aria-label={`Search ${keyword} on ${platform.label}`}
+            className="border-white/20 bg-white/10 text-zinc-100 hover:bg-white/20 hover:text-white"
           >
             <ExternalLink className="size-3.5" />
             {platform.label}

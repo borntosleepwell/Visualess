@@ -2,12 +2,17 @@
 
 import { motion } from "motion/react";
 import { ArrowRight, Loader2, Save } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
+import logo from "@/assets/logo/Logo.svg";
+import mountainBackground from "@/assets/picture/mountain.png";
 import { AnalysisResult } from "@/components/analysis/analysis-result";
 import { ImagePreview } from "@/components/analysis/image-preview";
+import { KeywordList } from "@/components/analysis/keyword-list";
 import { UploadDropzone } from "@/components/analysis/upload-dropzone";
 import { Button } from "@/components/ui/button";
+import { extractColorPalette } from "@/lib/color-palette";
 import { analyzeDesignResponseSchema } from "@/lib/validation/analysis-schema";
 import { cn } from "@/lib/utils";
 import type { DesignAnalysis, OutputLanguage } from "@/types/analysis";
@@ -17,6 +22,11 @@ const outputLanguages: Array<{ label: string; value: OutputLanguage }> = [
   { label: "English", value: "en" },
 ];
 
+const keywordLabels: Record<OutputLanguage, string> = {
+  id: "Keyword pencarian",
+  en: "Search keywords",
+};
+
 export function AnalyzeWorkspace() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -24,6 +34,8 @@ export function AnalyzeWorkspace() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<DesignAnalysis | null>(null);
   const [outputLanguage, setOutputLanguage] = useState<OutputLanguage>("id");
+  const [palette, setPalette] = useState<string[]>([]);
+  const [paletteError, setPaletteError] = useState<string | null>(null);
 
   const canAnalyze = Boolean(file) && !isAnalyzing;
 
@@ -36,14 +48,22 @@ export function AnalyzeWorkspace() {
   }, [previewUrl]);
 
   function handleFileAccepted(nextFile: File) {
+    const nextPreviewUrl = URL.createObjectURL(nextFile);
+
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
 
     setFile(nextFile);
-    setPreviewUrl(URL.createObjectURL(nextFile));
+    setPreviewUrl(nextPreviewUrl);
     setErrorMessage(null);
     setAnalysis(null);
+    setPalette([]);
+    setPaletteError(null);
+
+    extractColorPalette(nextPreviewUrl)
+      .then(setPalette)
+      .catch(() => setPaletteError("Palette extraction failed."));
   }
 
   function handleRemoveImage() {
@@ -55,6 +75,8 @@ export function AnalyzeWorkspace() {
     setPreviewUrl(null);
     setAnalysis(null);
     setErrorMessage(null);
+    setPalette([]);
+    setPaletteError(null);
   }
 
   async function handleAnalyze() {
@@ -103,7 +125,7 @@ export function AnalyzeWorkspace() {
 
   const statusText = useMemo(() => {
     if (isAnalyzing) {
-      return "Reading layout, colors, typography, and mood...";
+      return "Analyzing visual style...";
     }
 
     if (analysis) {
@@ -117,78 +139,75 @@ export function AnalyzeWorkspace() {
     return "Waiting for a reference image";
   }, [analysis, file, isAnalyzing]);
 
+  const activeContent = analysis?.localized[outputLanguage];
+
   return (
-    <main className="min-h-screen bg-[#f7f5f0] text-zinc-950">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 py-4">
-          <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">
-              Visualess
-            </p>
-            <h1 className="text-xl font-semibold tracking-normal text-zinc-950">
-              Design style analyzer
-            </h1>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-600">
-            {statusText}
-          </div>
+    <main className="relative min-h-[100svh] overflow-x-hidden bg-[#1B1D1A] text-zinc-50">
+      <div className="fixed inset-0 h-screen">
+        <Image
+          src={mountainBackground}
+          alt=""
+          fill
+          priority
+          className="object-cover object-[center_42%]"
+          sizes="100vw"
+        />
+      </div>
+      <div className="fixed inset-0 h-screen bg-black/10" />
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-[min(82vw,1440px)] flex-col py-4">
+        <header className="flex shrink-0 items-center justify-center py-0">
+          <Image
+            src={logo}
+            alt="Visualess"
+            className="h-9 w-auto sm:h-11"
+            priority
+          />
         </header>
 
-        <section className="grid flex-1 gap-4 py-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(420px,1.08fr)]">
+        <section className="grid flex-1 items-start gap-6 pt-6 pb-5 lg:grid-cols-[minmax(600px,1.35fr)_minmax(450px,0.95fr)] xl:pt-8">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="space-y-4"
+            className="flex min-h-[500px] flex-col rounded-[1.75rem] border border-white/70 bg-[#171a16] p-5 shadow-2xl shadow-black/20 sm:p-8 lg:h-[min(650px,calc(100svh-112px))] lg:min-h-[540px]"
           >
-            {file && previewUrl ? (
-              <ImagePreview
-                file={file}
-                previewUrl={previewUrl}
-                onRemove={handleRemoveImage}
-              />
-            ) : (
-              <UploadDropzone
-                onFileAccepted={handleFileAccepted}
-                onError={setErrorMessage}
-              />
-            )}
+            <div className="flex flex-1 items-center justify-center">
+              <div className="w-full max-w-3xl">
+                {file && previewUrl ? (
+                  <ImagePreview
+                    file={file}
+                    previewUrl={previewUrl}
+                    onRemove={handleRemoveImage}
+                  />
+                ) : (
+                  <UploadDropzone
+                    onFileAccepted={handleFileAccepted}
+                    onError={setErrorMessage}
+                  />
+                )}
+              </div>
+            </div>
 
             {errorMessage ? (
-              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p className="mt-4 rounded-2xl border border-red-300/40 bg-red-950/70 px-4 py-3 text-sm font-light text-red-100">
                 {errorMessage}
               </p>
             ) : null}
 
-            <section className="space-y-2">
-              <p className="text-xs font-medium uppercase text-zinc-500">
-                Output language
+            {paletteError ? (
+              <p className="mt-4 rounded-2xl border border-amber-300/40 bg-amber-950/70 px-4 py-3 text-sm font-light text-amber-100">
+                {paletteError}
               </p>
-              <div className="inline-flex rounded-lg border border-zinc-200 bg-white p-1">
-                {outputLanguages.map((language) => (
-                  <button
-                    key={language.value}
-                    type="button"
-                    onClick={() => setOutputLanguage(language.value)}
-                    className={cn(
-                      "h-8 rounded-md px-3 text-sm font-medium text-zinc-500 transition",
-                      outputLanguage === language.value &&
-                        "bg-zinc-950 text-white shadow-sm",
-                    )}
-                    aria-pressed={outputLanguage === language.value}
-                  >
-                    {language.label}
-                  </button>
-                ))}
-              </div>
-            </section>
+            ) : null}
 
-            <div className="flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <Button
                 type="button"
                 size="lg"
                 disabled={!canAnalyze}
                 onClick={handleAnalyze}
+                className="rounded-full bg-zinc-50 px-5 text-zinc-950 hover:bg-white disabled:bg-zinc-500 disabled:text-zinc-300"
               >
                 {isAnalyzing ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -197,10 +216,19 @@ export function AnalyzeWorkspace() {
                 )}
                 Analyze design
               </Button>
-              <Button type="button" variant="outline" size="lg" disabled={!analysis}>
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                disabled={!analysis}
+                className="rounded-full border-white/30 bg-white/10 px-5 text-zinc-50 hover:bg-white/20 disabled:text-zinc-500"
+              >
                 <Save className="size-4" />
                 Save analysis
               </Button>
+              <span className="ml-auto text-sm font-light text-zinc-300">
+                {statusText}
+              </span>
             </div>
           </motion.div>
 
@@ -210,30 +238,44 @@ export function AnalyzeWorkspace() {
             transition={{ duration: 0.35, delay: 0.08 }}
           >
             {analysis ? (
-              <AnalysisResult analysis={analysis} language={outputLanguage} />
+              <div className="space-y-3">
+                <LanguageSwitch
+                  outputLanguage={outputLanguage}
+                  onChange={setOutputLanguage}
+                />
+                <AnalysisResult
+                  analysis={analysis}
+                  language={outputLanguage}
+                  palette={palette}
+                />
+              </div>
             ) : (
-              <section className="flex min-h-[520px] flex-col justify-between rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+              <section className="flex min-h-[500px] flex-col justify-between rounded-[1.75rem] border border-white/70 bg-[#171a16] p-6 text-zinc-50 shadow-2xl shadow-black/20 sm:p-8 lg:h-[min(650px,calc(100svh-112px))] lg:min-h-[540px]">
+                <LanguageSwitch
+                  outputLanguage={outputLanguage}
+                  onChange={setOutputLanguage}
+                />
                 <div>
-                  <p className="text-xs font-medium uppercase text-zinc-500">
+                  <p className="text-xs font-medium uppercase text-zinc-400">
                     Output
                   </p>
-                  <h2 className="mt-2 max-w-md text-3xl font-semibold tracking-normal text-zinc-950">
+                  <h2 className="mt-8 max-w-md text-4xl font-semibold tracking-normal text-zinc-50">
                     Visual language will appear here.
                   </h2>
-                  <p className="mt-3 max-w-lg text-sm leading-7 text-zinc-500">
-                    Upload a reference, run analysis, then use the generated
-                    tags and keywords for research.
+                  <p className="mt-5 max-w-lg text-lg font-light leading-7 text-zinc-300">
+                    Upload a design reference to extract style taxonomy,
+                    typography cues, mood, palette, and searchable keywords.
                   </p>
                 </div>
 
-                <div className="grid gap-3 border-t border-zinc-200 pt-5 sm:grid-cols-3">
-                  {["Style tags", "Search keywords", "Reference actions"].map(
+                <div className="grid gap-4 border-t border-white/15 pt-6 sm:grid-cols-3">
+                  {["Style tags", "Palette", "Search keywords"].map(
                     (item) => (
                       <div
                         key={item}
-                        className="border-l border-zinc-200 pl-3 first:border-l-0 first:pl-0"
+                        className="border-l border-white/20 pl-3 first:border-l-0 first:pl-0"
                       >
-                        <p className="text-sm font-medium text-zinc-800">
+                        <p className="text-sm font-light text-zinc-300">
                           {item}
                         </p>
                       </div>
@@ -244,7 +286,50 @@ export function AnalyzeWorkspace() {
             )}
           </motion.div>
         </section>
+
+        {activeContent ? (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.12 }}
+            className="pb-8"
+          >
+            <KeywordList
+              label={keywordLabels[outputLanguage]}
+              keywords={activeContent.searchKeywords}
+            />
+          </motion.div>
+        ) : null}
       </div>
     </main>
+  );
+}
+
+type LanguageSwitchProps = {
+  outputLanguage: OutputLanguage;
+  onChange: (language: OutputLanguage) => void;
+};
+
+function LanguageSwitch({ outputLanguage, onChange }: LanguageSwitchProps) {
+  return (
+    <div className="flex justify-end">
+      <div className="inline-flex rounded-full border border-white/20 bg-black/25 p-1">
+      {outputLanguages.map((language) => (
+        <button
+          key={language.value}
+          type="button"
+          onClick={() => onChange(language.value)}
+          className={cn(
+            "h-8 rounded-full px-3 text-sm font-medium text-zinc-300 transition hover:text-white",
+            outputLanguage === language.value &&
+              "bg-white text-zinc-950 shadow-sm",
+          )}
+          aria-pressed={outputLanguage === language.value}
+        >
+          {language.label}
+        </button>
+      ))}
+      </div>
+    </div>
   );
 }

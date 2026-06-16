@@ -5,13 +5,13 @@ type TagGroupProps = {
 
 export function TagGroup({ label, tags }: TagGroupProps) {
   return (
-    <section className="space-y-2">
-      <h3 className="text-xs font-medium uppercase text-zinc-500">{label}</h3>
+    <section className="space-y-3">
+      <h3 className="text-[1.05rem] font-semibold text-zinc-50">{label}</h3>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs font-medium text-zinc-700 shadow-sm"
+            className="rounded-full border border-white/45 px-3 py-1 text-sm font-light leading-none text-zinc-100 transition hover:border-white hover:bg-white/10"
           >
             {tag}
           </span>

@@ -54,26 +54,39 @@ export function UploadDropzone({
     <section
       {...getRootProps()}
       className={cn(
-        "flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-white p-8 text-center transition-colors",
-        isDragActive && "border-cyan-400 bg-cyan-50",
+        "relative flex min-h-[320px] flex-col items-center justify-center overflow-hidden rounded-[1.75rem] border border-white/70 bg-[#171a16] p-8 text-center transition-colors sm:min-h-[370px] lg:min-h-[420px]",
+        isDragActive && "border-lime-300 bg-[#20261b]",
       )}
     >
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 opacity-[0.16]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.24) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.24) 1px, transparent 1px)",
+          backgroundSize: "34px 34px",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(23,26,22,0.72)_62%,#171a16_100%)]"
+      />
       <input {...getInputProps()} />
-      <div className="flex size-12 items-center justify-center rounded-lg bg-zinc-950 text-white">
+      <div className="relative flex size-12 items-center justify-center rounded-full bg-black text-white">
         <ImageUp className="size-5" />
       </div>
-      <h2 className="mt-5 text-xl font-semibold text-zinc-950">
+      <h2 className="relative mt-5 text-2xl font-light text-zinc-50">
         Upload a design reference
       </h2>
-      <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500">
+      <p className="relative mt-3 max-w-md text-sm font-light leading-6 text-zinc-300">
         Drop a PNG, JPG, JPEG, or WEBP file here. Maximum upload size is 10MB.
       </p>
       <Button
         type="button"
         onClick={open}
-        className="mt-6"
+        className="relative mt-6 rounded-full bg-black px-5 text-zinc-50 hover:bg-zinc-900"
       >
-        Choose image
+        choose image
       </Button>
     </section>
   );

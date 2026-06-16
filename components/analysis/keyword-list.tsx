@@ -27,10 +27,21 @@ export function KeywordList({ label, keywords }: KeywordListProps) {
   }
 
   return (
-    <section className="space-y-3">
+    <section className="rounded-[1.75rem] border border-white/70 bg-[#171a16] p-5 text-zinc-50 shadow-2xl shadow-black/20 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-zinc-950">{label}</h3>
-        <Button type="button" variant="outline" size="sm" onClick={copyAllKeywords}>
+        <div>
+          <p className="text-xs font-light uppercase text-zinc-400">
+            Reference discovery
+          </p>
+          <h3 className="mt-1 text-2xl font-semibold text-zinc-50">{label}</h3>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={copyAllKeywords}
+          className="border-white/25 bg-white/10 text-zinc-50 hover:bg-white/20"
+        >
           {copiedKeyword === "all" ? (
             <Check className="size-3.5" />
           ) : (
@@ -40,14 +51,14 @@ export function KeywordList({ label, keywords }: KeywordListProps) {
         </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
         {keywords.map((keyword) => (
           <article
             key={keyword}
-            className="space-y-3 border-t border-zinc-200 py-3 first:border-t-0 first:pt-0"
+            className="space-y-4 rounded-2xl border border-white/15 bg-black/20 p-4 transition hover:border-white/35 hover:bg-black/30"
           >
             <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-medium leading-6 text-zinc-800">
+              <p className="break-words text-base font-medium leading-6 text-zinc-100">
                 {keyword}
               </p>
               <Button
@@ -56,6 +67,7 @@ export function KeywordList({ label, keywords }: KeywordListProps) {
                 size="icon-sm"
                 onClick={() => copyKeyword(keyword)}
                 aria-label={`Copy ${keyword}`}
+                className="text-zinc-100 hover:bg-white/10 hover:text-white"
               >
                 {copiedKeyword === keyword ? (
                   <Check className="size-4" />

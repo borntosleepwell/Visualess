@@ -5,11 +5,12 @@ export type TagGroupKey =
   | "typographyTags"
   | "moodTags";
 
-export type OutputLanguage = "id" | "en";
-
-export type LocalizedAnalysisContent = {
+export type DesignAnalysis = {
+  id?: string;
+  isDesignRelated: boolean;
   rejectionReason?: string | null;
   title: string;
+  imageUrl?: string;
   designNarrative: string;
   styleTags: string[];
   layoutTags: string[];
@@ -17,13 +18,6 @@ export type LocalizedAnalysisContent = {
   typographyTags: string[];
   moodTags: string[];
   searchKeywords: string[];
-};
-
-export type DesignAnalysis = {
-  id?: string;
-  isDesignRelated: boolean;
-  imageUrl?: string;
-  localized: Record<OutputLanguage, LocalizedAnalysisContent>;
   createdAt?: string;
 };
 

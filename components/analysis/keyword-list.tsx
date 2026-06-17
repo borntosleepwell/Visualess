@@ -33,7 +33,9 @@ export function KeywordList({ label, keywords }: KeywordListProps) {
           <p className="text-xs font-light uppercase text-zinc-400">
             Reference discovery
           </p>
-          <h3 className="mt-1 text-2xl font-semibold text-zinc-50">{label}</h3>
+          <h3 className="mt-1 font-pixel text-2xl font-semibold text-zinc-50">
+            {label}
+          </h3>
         </div>
         <Button
           type="button"

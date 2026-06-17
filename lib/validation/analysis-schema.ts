@@ -1,10 +1,11 @@
 import { z } from "zod";
 
-export const outputLanguageSchema = z.enum(["id", "en"]);
-
-const localizedAnalysisContentSchema = z.object({
+// This schema is the single source of truth for analysis data used by API and UI.
+export const analysisSchema = z.object({
+  isDesignRelated: z.boolean(),
   rejectionReason: z.string().nullable().optional(),
   title: z.string().min(1),
+  imageUrl: z.string().optional(),
   designNarrative: z.string().min(1),
   styleTags: z.array(z.string()).min(3).max(8),
   layoutTags: z.array(z.string()).min(3).max(8),
@@ -12,16 +13,6 @@ const localizedAnalysisContentSchema = z.object({
   typographyTags: z.array(z.string()).min(3).max(8),
   moodTags: z.array(z.string()).min(3).max(8),
   searchKeywords: z.array(z.string()).min(6).max(8),
-});
-
-// This schema is the single source of truth for analysis data used by API and UI.
-export const analysisSchema = z.object({
-  isDesignRelated: z.boolean(),
-  imageUrl: z.string().optional(),
-  localized: z.object({
-    id: localizedAnalysisContentSchema,
-    en: localizedAnalysisContentSchema,
-  }),
 });
 
 export const uploadSchema = z.object({

@@ -4,11 +4,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Geist Pixel Local";
+  src: url("../assets/fonts/GeistPixel-Square.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400 700;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-geist-pixel);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -126,5 +135,11 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .font-pixel {
+    font-family: "Geist Pixel Local", var(--font-geist-pixel), var(--font-geist-mono), monospace;
   }
 }

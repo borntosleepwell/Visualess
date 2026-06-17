@@ -14,18 +14,9 @@ import { UploadDropzone } from "@/components/analysis/upload-dropzone";
 import { Button } from "@/components/ui/button";
 import { extractColorPalette } from "@/lib/color-palette";
 import { analyzeDesignResponseSchema } from "@/lib/validation/analysis-schema";
-import { cn } from "@/lib/utils";
-import type { DesignAnalysis, OutputLanguage } from "@/types/analysis";
+import type { DesignAnalysis } from "@/types/analysis";
 
-const outputLanguages: Array<{ label: string; value: OutputLanguage }> = [
-  { label: "Indonesia", value: "id" },
-  { label: "English", value: "en" },
-];
-
-const keywordLabels: Record<OutputLanguage, string> = {
-  id: "Keyword pencarian",
-  en: "Search keywords",
-};
+const keywordLabel = "Search Keywords";
 
 export function AnalyzeWorkspace() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,7 +24,6 @@ export function AnalyzeWorkspace() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<DesignAnalysis | null>(null);
-  const [outputLanguage, setOutputLanguage] = useState<OutputLanguage>("id");
   const [palette, setPalette] = useState<string[]>([]);
   const [paletteError, setPaletteError] = useState<string | null>(null);
 
@@ -106,9 +96,8 @@ export function AnalyzeWorkspace() {
 
       if (!payload.data.isDesignRelated) {
         setAnalysis(null);
-        const rejectionContent = payload.data.localized[outputLanguage];
         setErrorMessage(
-          rejectionContent.rejectionReason ??
+          payload.data.rejectionReason ??
             "This image does not look like a design reference. Please upload a UI, graphic design, poster, branding, or visual layout reference.",
         );
         return;
@@ -139,7 +128,7 @@ export function AnalyzeWorkspace() {
     return "Waiting for a reference image";
   }, [analysis, file, isAnalyzing]);
 
-  const activeContent = analysis?.localized[outputLanguage];
+  const activeKeywords = analysis?.searchKeywords;
 
   return (
     <main className="relative min-h-[100svh] overflow-x-hidden bg-[#1B1D1A] text-zinc-50">
@@ -214,7 +203,7 @@ export function AnalyzeWorkspace() {
                 ) : (
                   <ArrowRight className="size-4" />
                 )}
-                Analyze design
+                <span className="font-pixel">Analyze design</span>
               </Button>
               <Button
                 type="button"
@@ -224,7 +213,7 @@ export function AnalyzeWorkspace() {
                 className="rounded-full border-white/30 bg-white/10 px-5 text-zinc-50 hover:bg-white/20 disabled:text-zinc-500"
               >
                 <Save className="size-4" />
-                Save analysis
+                <span className="font-pixel">Save analysis</span>
               </Button>
               <span className="ml-auto text-sm font-light text-zinc-300">
                 {statusText}
@@ -238,23 +227,12 @@ export function AnalyzeWorkspace() {
             transition={{ duration: 0.35, delay: 0.08 }}
           >
             {analysis ? (
-              <div className="space-y-3">
-                <LanguageSwitch
-                  outputLanguage={outputLanguage}
-                  onChange={setOutputLanguage}
-                />
-                <AnalysisResult
-                  analysis={analysis}
-                  language={outputLanguage}
-                  palette={palette}
-                />
-              </div>
+              <AnalysisResult
+                analysis={analysis}
+                palette={palette}
+              />
             ) : (
               <section className="flex min-h-[500px] flex-col justify-between rounded-[1.75rem] border border-white/70 bg-[#171a16] p-6 text-zinc-50 shadow-2xl shadow-black/20 sm:p-8 lg:h-[min(650px,calc(100svh-112px))] lg:min-h-[540px]">
-                <LanguageSwitch
-                  outputLanguage={outputLanguage}
-                  onChange={setOutputLanguage}
-                />
                 <div>
                   <p className="text-xs font-medium uppercase text-zinc-400">
                     Output
@@ -275,7 +253,11 @@ export function AnalyzeWorkspace() {
                         key={item}
                         className="border-l border-white/20 pl-3 first:border-l-0 first:pl-0"
                       >
-                        <p className="text-sm font-light text-zinc-300">
+                        <p
+                          className={`text-sm font-light text-zinc-300 ${
+                            item === "Search keywords" ? "font-pixel" : ""
+                          }`}
+                        >
                           {item}
                         </p>
                       </div>
@@ -287,7 +269,7 @@ export function AnalyzeWorkspace() {
           </motion.div>
         </section>
 
-        {activeContent ? (
+        {activeKeywords ? (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -295,41 +277,12 @@ export function AnalyzeWorkspace() {
             className="pb-8"
           >
             <KeywordList
-              label={keywordLabels[outputLanguage]}
-              keywords={activeContent.searchKeywords}
+              label={keywordLabel}
+              keywords={activeKeywords}
             />
           </motion.div>
         ) : null}
       </div>
     </main>
-  );
-}
-
-type LanguageSwitchProps = {
-  outputLanguage: OutputLanguage;
-  onChange: (language: OutputLanguage) => void;
-};
-
-function LanguageSwitch({ outputLanguage, onChange }: LanguageSwitchProps) {
-  return (
-    <div className="flex justify-end">
-      <div className="inline-flex rounded-full border border-white/20 bg-black/25 p-1">
-      {outputLanguages.map((language) => (
-        <button
-          key={language.value}
-          type="button"
-          onClick={() => onChange(language.value)}
-          className={cn(
-            "h-8 rounded-full px-3 text-sm font-medium text-zinc-300 transition hover:text-white",
-            outputLanguage === language.value &&
-              "bg-white text-zinc-950 shadow-sm",
-          )}
-          aria-pressed={outputLanguage === language.value}
-        >
-          {language.label}
-        </button>
-      ))}
-      </div>
-    </div>
   );
 }

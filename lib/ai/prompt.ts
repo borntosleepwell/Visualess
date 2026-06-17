@@ -11,38 +11,19 @@ Return the result strictly as JSON with this structure:
 
 {
   "isDesignRelated": true,
-  "localized": {
-    "id": {
-      "rejectionReason": null,
-      "title": "",
-      "designNarrative": "",
-      "styleTags": [],
-      "layoutTags": [],
-      "colorTags": [],
-      "typographyTags": [],
-      "moodTags": [],
-      "searchKeywords": []
-    },
-    "en": {
-      "rejectionReason": null,
-      "title": "",
-      "designNarrative": "",
-      "styleTags": [],
-      "layoutTags": [],
-      "colorTags": [],
-      "typographyTags": [],
-      "moodTags": [],
-      "searchKeywords": []
-    }
-  }
+  "rejectionReason": null,
+  "title": "",
+  "designNarrative": "",
+  "styleTags": [],
+  "layoutTags": [],
+  "colorTags": [],
+  "typographyTags": [],
+  "moodTags": [],
+  "searchKeywords": []
 }
 
 Rules:
-- Return bilingual content in one response.
-- Put Indonesian text in "localized.id".
-- Put English text in "localized.en".
-- Both languages must describe the same design interpretation, not two different analyses.
-- Use a professional design critique tone. Do not sound overly casual.
+- Use English with a professional design critique tone. Do not sound overly casual.
 - Focus on visual design style, not only image content.
 - Be specific. Avoid generic tags such as "Modern", "Creative", "Clean", "Nice", or "Aesthetic" unless paired with a precise design style.
 - Do not invent brand names.
@@ -55,7 +36,7 @@ Rules:
 - Search keywords must be specific and useful for finding similar design references on Google, Pinterest, Behance, and Dribbble.
 - Each keyword should combine style + medium + layout/color/typography context. Example: "Y2K chrome typography poster design", "neo brutalist SaaS landing page grid", "Bauhaus primary color poster layout".
 - Generate 6 to 8 search keywords.
-- If the image is not design-related, set "isDesignRelated": false, write short rejectionReason values in both languages, and still return valid JSON with concise fallback title, narrative, tags, and keywords explaining that no design style analysis was made.
+- If the image is not design-related, set "isDesignRelated": false, write a short rejectionReason, and still return valid JSON with concise fallback title, narrative, tags, and keywords explaining that no design style analysis was made.
 - Do not include markdown.
 - Return JSON only.
 `.trim();

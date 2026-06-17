@@ -149,7 +149,7 @@ export function AnalyzeWorkspace() {
           <Image
             src={logo}
             alt="Visualess"
-            className="h-9 w-auto sm:h-11"
+            className="h-5 w-auto sm:h-9"
             priority
           />
         </header>
